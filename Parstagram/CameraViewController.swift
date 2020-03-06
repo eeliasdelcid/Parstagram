@@ -13,8 +13,8 @@ import Parse
 class CameraViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var imageView: UIImageView!
-    
     @IBOutlet weak var commentField: UITextField!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,10 +22,11 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         // Do any additional setup after loading the view.
     }
     
-    @IBAction func onSubmit(_ sender: Any) {
+    
+    @IBAction func onSubmitButton(_ sender: Any) {
         let post = PFObject(className: "Posts")
         
-        post["caption"] = commentField.text!
+        post["caption"] = commentField.text
         post["author"] = PFUser.current()!
         
         let imageData = imageView.image!.pngData()
@@ -36,34 +37,33 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         post.saveInBackground { (success, error) in
             if success {
                 self.dismiss(animated: true, completion: nil)
-                print("saved!")
+                print("Saved!")
             } else {
-                print("error!")
+                print("Error!")
             }
         }
-        
-        
     }
     
-    @IBAction func onCamera(_ sender: Any) {
-        let picker = UIImagePickerController()
+    @IBAction func onCameraButton(_ sender: Any) {
+        let picker = UIImagePickerController ()
         picker.delegate = self
         picker.allowsEditing = true
         
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
             picker.sourceType = .camera
         } else {
-            picker.sourceType = . photoLibrary
+            picker.sourceType = .photoLibrary
         }
         
         present(picker, animated: true, completion: nil)
+        
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         let image = info[.editedImage] as! UIImage
         
         let size = CGSize(width: 300, height: 300)
-        let scaledImage = image.af_imageScaled(to: size)
+        let scaledImage = image.af_imageAspectScaled(toFill: size)
         
         imageView.image = scaledImage
         
@@ -71,7 +71,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     /*
     // MARK: - Navigation
-
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
